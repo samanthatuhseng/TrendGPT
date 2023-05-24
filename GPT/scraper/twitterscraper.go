@@ -2,48 +2,85 @@ package main
 
 import (
 	"bufio"
-    "context"
-    "fmt"
+	"context"
+	"encoding/json"
 	"log"
 	"os"
-    twitterscraper "github.com/n0madic/twitter-scraper"
+	"io/ioutil"
+
+	twitterscraper "github.com/n0madic/twitter-scraper"
+	"github.com/tidwall/pretty"
 )
 
-func getTweets(keyword string) {
-    scraper := twitterscraper.New()
+type Tweet struct {
+	Text string `json:"text"`
+	PermanentURL string `json:"permanent_url"`
+	Author string `json:"author"`
+	Retweets int `json:retweets`
+	Likes int `json:"likes"`
+}	
 
-	// Open a file for writing
-	file, err := os.Create("tweets.txt")
+func getTweets() {
+	scraper := twitterscraper.New()
+
+	err := scraper.Login("CaAr621", "CryptoArsenal!")
+
+	file, err := os.Create("tweets.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
 
-	// Create a writer to write to the file
 	writer := bufio.NewWriter(file)
+	encoder := json.NewEncoder(writer)
 
+	query := `(crypto OR cryptocurrency OR bitcoin OR ethereum OR btc OR eth OR blockchain) (from:elonmusk OR from:VitalikButerin OR from:SatoshiLite OR from:brian_armstrong OR from:cz_binance OR filter:verified) -filter:retweets :) OR :( OR ?`
 
-    for tweet := range scraper.GetTweets(context.Background(), keyword, 50) {
-        if tweet.Error != nil {
-            panic(tweet.Error)
-        }
-        // Write the tweet text to the file
-		_, err := writer.WriteString(tweet.Text + "\n")
-		if err != nil {
-			log.Fatal(err)
+	tweets := []Tweet{}
+	for tweet := range scraper.SearchTweets(context.Background(),
+        query, 50){
+		if tweet.Error != nil {
+			panic(tweet.Error)
 		}
-    }
-	// Flush the writer to ensure all data is written to the file
+
+		t := Tweet{
+			Text:         tweet.Text,
+			PermanentURL: tweet.PermanentURL,
+			Author: tweet.Name,
+			Retweets: tweet.Retweets,
+			Likes: tweet.Likes,
+			// Set additional fields as needed
+		}
+
+		tweets = append(tweets, t)
+	}
+		
+	err = encoder.Encode(tweets)
+	if err != nil {
+		log.Fatal(err)
+	}
 	err = writer.Flush()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Tweets saved to tweets.txt")
+	// Read the JSON data from the file
+	jsonData, err := ioutil.ReadFile("tweets.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Format the JSON data
+	formattedJSON := pretty.Pretty(jsonData)
+
+	// Write the formatted JSON to file or print it
+	err = ioutil.WriteFile("formatted_tweets.json", formattedJSON, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func main() {
-	keyword := os.Args[1]
-	getTweets(keyword)
+	// keyword := os.Args[1]
+	getTweets()
 }
-
