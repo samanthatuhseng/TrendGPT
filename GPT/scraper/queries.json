@@ -1,6 +1,26 @@
 [
     {
-    "filter": "(crypto OR cryptocurrency OR bitcoin OR ethereum OR btc OR eth OR blockchain) (from:elonmusk OR from:VitalikButerin OR from:SatoshiLite OR from:brian_armstrong OR from:cz_binance OR filter:verified) -filter:retweets :) OR :( OR ?",
-    "explanation": "This filter captures tweets that mention the keywords 'crypto', 'cryptocurrency', 'bitcoin', 'ethereum', 'btc', 'eth', or 'blockchain' from either specific influential accounts in the crypto space or any verified accounts. The '-filter:retweets' part ensures that the query only returns original tweets and not retweets. The ':)', ':(', and '?' symbols search for tweets with positive, negative, and questioning sentiment respectively, which could provide a rough gauge of the overall sentiment towards the crypto market."
-    }
+        "filter": "(crypto OR cryptocurrency OR bitcoin OR ethereum OR btc OR eth OR blockchain) (from:elonmusk OR from:VitalikButerin OR from:SatoshiLite OR from:brian_armstrong OR from:cz_binance OR filter:verified) -filter:retweets :) OR :( OR ?",
+        "explanation": "This filter captures tweets that mention the keywords 'crypto', 'cryptocurrency', 'bitcoin', 'ethereum', 'btc', 'eth', or 'blockchain' from either specific influential accounts in the crypto space or any verified accounts. The '-filter:retweets' part ensures that the query only returns original tweets and not retweets. The ':)', ':(', and '?' symbols search for tweets with positive, negative, and questioning sentiment respectively, which could provide a rough gauge of the overall sentiment towards the crypto market."
+    },
+    {
+        "filter": "Bitcoin OR BTC lang:en",
+        "explanation": "Captures tweets mentioning 'Bitcoin' or 'BTC' in English."
+      },
+      {
+        "filter": "crypto OR cryptocurrency lang:en -scam -fraud",
+        "explanation": "Includes tweets discussing cryptocurrencies, excluding 'scam' or 'fraud' mentions."
+      },
+      {
+        "filter": "altcoins OR alts lang:en -bitcoin",
+        "explanation": "Targets tweets mentioning 'altcoins' or 'alts,' excluding Bitcoin references."
+      },
+      {
+        "filter": "blockchain lang:en",
+        "explanation": "Captures tweets related to blockchain technology."
+      },
+      {
+        "filter": "$crypto OR #cryptotrading lang:en",
+        "explanation": "Includes tweets with '$crypto' or '#cryptotrading' mentions."
+      }
 ]

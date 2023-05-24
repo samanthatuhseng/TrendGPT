@@ -20,6 +20,12 @@ type Tweet struct {
 	Likes int `json:"likes"`
 }	
 
+type Query struct {
+	Filter       string `json:"filter"`
+	Explanation  string `json:"explanation"`
+	// Add more properties as needed
+}
+
 func getTweets() {
 	scraper := twitterscraper.New()
 
@@ -34,27 +40,35 @@ func getTweets() {
 	writer := bufio.NewWriter(file)
 	encoder := json.NewEncoder(writer)
 
-	query := `(crypto OR cryptocurrency OR bitcoin OR ethereum OR btc OR eth OR blockchain) (from:elonmusk OR from:VitalikButerin OR from:SatoshiLite OR from:brian_armstrong OR from:cz_binance OR filter:verified) -filter:retweets :) OR :( OR ?`
+	// Read the queries from the JSON file
+	queriesFile, err := ioutil.ReadFile("queries.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	queries := []Query{}
+	err = json.Unmarshal(queriesFile, &queries)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	tweets := []Tweet{}
-	for tweet := range scraper.SearchTweets(context.Background(),
-        query, 50){
-		if tweet.Error != nil {
-			panic(tweet.Error)
+	for _, query := range queries {
+		for tweet := range scraper.SearchTweets(context.Background(),
+			query.Filter, 50){
+			if tweet.Error != nil {
+				panic(tweet.Error)
+			}
+			t := Tweet{
+						Text:         tweet.Text,
+						PermanentURL: tweet.PermanentURL,
+						Author: tweet.Name,
+						Retweets: tweet.Retweets,
+						Likes: tweet.Likes,
+					}
+			tweets = append(tweets, t)
 		}
-
-		t := Tweet{
-			Text:         tweet.Text,
-			PermanentURL: tweet.PermanentURL,
-			Author: tweet.Name,
-			Retweets: tweet.Retweets,
-			Likes: tweet.Likes,
-			// Set additional fields as needed
-		}
-
-		tweets = append(tweets, t)
 	}
-		
 	err = encoder.Encode(tweets)
 	if err != nil {
 		log.Fatal(err)
