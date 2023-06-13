@@ -11,12 +11,11 @@
       "author": {
         "type": "string"
       },
-      "retweets": {
+      "Retweets": {
         "type": "integer"
       },
       "likes": {
         "type": "integer"
       }
-    },
-    "required": ["text", "permanent_url", "author", "retweets", "likes"]
+    }
   }

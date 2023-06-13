@@ -4,9 +4,12 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.vectorstores import Chroma
 from langchain.llms import GPT4All, LlamaCpp
+from langchain.llms import OpenAI
+from langchain.embeddings.openai import OpenAIEmbeddings
+
 import os
 
-load_dotenv()
+load_dotenv("../privateGPT/.env")
 
 embeddings_model_name = os.environ.get("EMBEDDINGS_MODEL_NAME")
 persist_directory = os.environ.get('PERSIST_DIRECTORY')
@@ -19,6 +22,8 @@ from constants import CHROMA_SETTINGS
 
 def main(query):
     embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
+    # embeddings = OpenAIEmbeddings()
+
     db = Chroma(persist_directory=persist_directory, embedding_function=embeddings, client_settings=CHROMA_SETTINGS)
     retriever = db.as_retriever()
     # Prepare the LLM
@@ -28,6 +33,8 @@ def main(query):
             llm = LlamaCpp(model_path=model_path, n_ctx=model_n_ctx, callbacks=callbacks, verbose=False)
         case "GPT4All":
             llm = GPT4All(model=model_path, n_ctx=model_n_ctx, backend='gptj', callbacks=callbacks, verbose=False)
+        case "OpenAI":
+            llm = OpenAI()
         case _default:
             print(f"Model {model_type} not supported!")
             exit;

@@ -17,7 +17,7 @@ from langchain.document_loaders import (
     UnstructuredPowerPointLoader,
     UnstructuredWordDocumentLoader,
 )
-
+from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.embeddings import HuggingFaceEmbeddings
@@ -43,14 +43,16 @@ LOADER_MAPPING = {
     ".epub": (UnstructuredEPubLoader, {}),
     ".html": (UnstructuredHTMLLoader, {}),
     ".md": (UnstructuredMarkdownLoader, {}),
+    ".mdx": (UnstructuredMarkdownLoader, {}),
     ".odt": (UnstructuredODTLoader, {}),
     ".pdf": (PDFMinerLoader, {}),
     ".ppt": (UnstructuredPowerPointLoader, {}),
     ".pptx": (UnstructuredPowerPointLoader, {}),
     ".txt": (TextLoader, {"encoding": "utf8"}),
-    ".json": (JSONLoader, {"jq_schema": tweets_schema_json, "text_content": False}),
+    ".json": (JSONLoader, {"jq_schema": ".[] | {text: .text, permanent_url: .permanent_url, author: .author, Retweets: .Retweets, likes: .likes}", "text_content": False}),
     # Add more mappings for other file extensions and loaders as needed
 }
+
 
 
 load_dotenv()
@@ -94,6 +96,7 @@ def main():
 
     # Create embeddings
     embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
+    # embeddings = OpenAIEmbeddings()
     
     # Create and store locally vectorstore
     db = Chroma.from_documents(texts, embeddings, persist_directory=persist_directory, client_settings=CHROMA_SETTINGS)

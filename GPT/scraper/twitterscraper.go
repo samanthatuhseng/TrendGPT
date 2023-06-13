@@ -16,7 +16,7 @@ type Tweet struct {
 	Text string `json:"text"`
 	PermanentURL string `json:"permanent_url"`
 	Author string `json:"author"`
-	Retweets int `json:retweets`
+	Retweets int `json:"retweets"`
 	Likes int `json:"likes"`
 }	
 
@@ -55,7 +55,7 @@ func getTweets() {
 	tweets := []Tweet{}
 	for _, query := range queries {
 		for tweet := range scraper.SearchTweets(context.Background(),
-			query.Filter, 50){
+			query.Filter, 500){
 			if tweet.Error != nil {
 				panic(tweet.Error)
 			}
