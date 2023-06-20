@@ -21,7 +21,7 @@ def store():
 
 def queryGPT(query):
     # scrape()
-    store()
+    # store()
     query, answer, docs = privateGPT(query)
     serialized_docs = [doc.dict() for doc in docs]
     result = {
